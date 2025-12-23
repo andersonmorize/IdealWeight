@@ -18,8 +18,8 @@ class PersonService:
         return PersonTask.delete(person_id)
 
     @staticmethod
-    def handle_search(filters):
-        return PersonTask.filter_people(filters)
+    def handle_search(filters, search_term):
+        return PersonTask.filter_people(filters, search_term)
 
     @staticmethod
     def get_person_by_id(person_id):

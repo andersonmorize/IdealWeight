@@ -1,3 +1,4 @@
+from django.db.models import Q
 from .models import Person
 
 
@@ -23,9 +24,14 @@ class PersonTask:
         person.delete()
 
     @staticmethod
-    def filter_people(filters):
-        return Person.objects.filter(**filters)
-
-    @staticmethod
     def get_by_id(person_id):
         return Person.objects.get(pk=person_id)
+
+    @staticmethod
+    def filter_people(filters, search_term=None):
+        queryset = Person.objects.filter(**filters)
+        if search_term:
+            queryset = queryset.filter(
+                Q(name__icontains=search_term) | Q(cpf=search_term)
+            )
+        return queryset

@@ -136,3 +136,47 @@ class PersonAPITests(APITestCase):
         response = self.client.get(detail_url)
         
         self.assertEqual(float(response.data['ideal_weight']), 72.86)
+
+    def test_search_by_name_partial(self):
+        """Testa se a pesquisa encontra uma pessoa por parte do nome (icontains)"""
+        # Criamos uma pessoa específica para este teste
+        Person.objects.create(
+            name="Alice Wonder",
+            date_of_birth="1992-01-01",
+            cpf="11122233344",
+            sex="F",
+            height=1.70,
+            weight=65.00
+        )
+        
+        # Pesquisamos apenas por "Wonder"
+        response = self.client.get(self.url, {'search': 'Wonder'}, format='json')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], "Alice Wonder")
+
+    def test_search_by_cpf_exact(self):
+        """Testa se a pesquisa encontra uma pessoa pelo CPF exato"""
+        target_cpf = "55566677788"
+        Person.objects.create(
+            name="Bob Searcher",
+            date_of_birth="1985-03-10",
+            cpf=target_cpf,
+            sex="M",
+            height=1.75,
+            weight=80.00
+        )
+        
+        response = self.client.get(self.url, {'search': target_cpf}, format='json')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['cpf'], target_cpf)
+
+    def test_search_no_results(self):
+        """Testa se retorna lista vazia quando nenhum critério é satisfeito"""
+        response = self.client.get(self.url, {'search': 'Inexistente'}, format='json')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)

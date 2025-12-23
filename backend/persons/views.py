@@ -20,19 +20,10 @@ class PersonViewSet(viewsets.ViewSet):
     @method_decorator(cache_page(60))
     @method_decorator(vary_on_cookie)
     def list(self, request):
-        """
-        Operação: Pesquisar
-        Filtra por nome ou CPF através da Service.
-        """
-        filters = {}
-        nome = request.query_params.get('name')
-        cpf = request.query_params.get('cpf')
+        search_query = request.query_params.get('search')
         
-        if nome: filters['name__icontains'] = nome
-        if cpf: filters['cpf'] = cpf
-
-        # Chamada para a Service conforme item 4 da prova [cite: 32]
-        people = PersonService.handle_search(filters)
+        people = PersonService.handle_search(filters={}, search_term=search_query)
+        
         serializer = PersonSerializer(people, many=True)
         return Response(serializer.data)
     
