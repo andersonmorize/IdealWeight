@@ -36,6 +36,28 @@ export const usePersonStore = defineStore('person', () => {
     }
   }
 
+  async function savePerson(person: Person) {
+    loading.value = true
+    try {
+      if (person.id) {
+        const response = await api.put(`/persons/${person.id}/`, person)
+        const index = persons.value.findIndex(p => p.id === person.id)
+        if (index !== -1) persons.value[index] = response.data
+      } else {
+        const response = await api.post('/persons/', person)
+        persons.value.unshift(response.data)
+      }
+      return { success: true }
+    } catch (error: any) {
+      return { 
+        success: false, 
+        errors: error.response?.data || { detail: 'Erro inesperado no servidor' } 
+      }
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function deletePerson(id: number) {
     if(!confirm('Tem certeza que deseja excluir?')) return;
     try {
@@ -47,5 +69,5 @@ export const usePersonStore = defineStore('person', () => {
     }
   }
 
-  return { persons, loading, fetchPersons, deletePerson }
+  return { persons, loading, fetchPersons, deletePerson, savePerson }
 })
