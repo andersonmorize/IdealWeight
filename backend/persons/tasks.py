@@ -6,6 +6,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Q
 from .models import Person
+from .validators import validate_cpf_numbers
 
 
 class PersonTask:
