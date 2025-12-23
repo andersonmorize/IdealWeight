@@ -2,6 +2,9 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 
+from .validators import validate_cpf_numbers
+
+
 class Person(models.Model):
     SEX_CHOICES = [
         ('M', 'Masculino'),
@@ -10,7 +13,11 @@ class Person(models.Model):
 
     name = models.CharField(max_length=150)
     date_of_birth = models.DateField()
-    cpf = models.CharField(max_length=14, unique=True)
+    cpf = models.CharField(
+        max_length=14,
+        unique=True,
+        validators=[validate_cpf_numbers]
+    )
     sex = models.CharField(max_length=1, choices=SEX_CHOICES)
     height = models.DecimalField(
         max_digits=3, 

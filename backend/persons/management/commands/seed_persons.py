@@ -28,10 +28,13 @@ class Command(BaseCommand):
             else:
                 name = fake.name_female()
 
+            cpf = fake.cpf()
+            cpf = cpf.replace('.', '').replace('-', '')
+
             Person.objects.create(
                 name=name,
                 date_of_birth=fake.date_of_birth(minimum_age=10, maximum_age=90),
-                cpf=fake.cpf(), # O Faker pt_BR já gera CPFs formatados
+                cpf=cpf,
                 sex=sex,
                 height=round(random.uniform(1.50, 2.00), 2),
                 weight=round(random.uniform(50.00, 110.00), 2)
