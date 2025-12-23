@@ -31,12 +31,12 @@ class PersonService:
         Lógica para o ponto extra solicitada na prova.
         """
         person = PersonTask.get_by_id(person_id)
-        altura = float(person.height)
+        height = float(person.height)
         
         # Fórmulas exigidas: Homem: (72.7 * altura) - 58 | Mulher: (62.1 * altura) - 44.7
         if person.sex == 'M':
-            peso_ideal = (72.7 * altura) - 58
+            ideal_weight = (72.7 * height) - 58
         else:
-            peso_ideal = (62.1 * altura) - 44.7
+            ideal_weight = (62.1 * height) - 44.7
             
-        return round(peso_ideal, 2)
+        return round(ideal_weight, 2)

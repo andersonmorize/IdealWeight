@@ -1,4 +1,19 @@
 <template>
+  <v-dialog v-model="idealWeightDialog" max-width="400">
+    <v-card>
+      <v-card-title class="text-h5">Peso Ideal Calculado</v-card-title>
+      <v-card-text class="text-center py-4">
+        <div class="text-h4 font-weight-bold text-primary">
+          {{ calculatedWeight }} kg
+        </div>
+        <p class="mt-2 text-grey">Resultado baseado na fórmula oficial.</p>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" variant="text" @click="idealWeightDialog = false">Fechar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
   <v-container>
     <v-card class="mb-4">
       <v-card-title>Consulta de Pessoas</v-card-title>
@@ -37,6 +52,13 @@
             color="warning" 
             class="mr-2"
             @click="openEdit(item)" 
+          ></v-btn>
+          <v-btn 
+            icon="mdi-scale-balance" 
+            size="small" 
+            color="info" 
+            class="mr-2"
+            @click="handleCalculateIdealWeight(item.id!)"
           ></v-btn>
           <v-btn 
             icon="mdi-delete" 
@@ -81,6 +103,10 @@ const searchQuery = ref('')
 const formDialog = ref(false)         // Controla se o modal aparece
 const selectedPerson = ref<Person | null>(null) // Armazena os dados para edição
 
+// --- NEW STATE FOR POPUP ---
+const idealWeightDialog = ref(false)
+const calculatedWeight = ref<number | null>(null)
+
 const headers = [
   { title: 'Nome', key: 'name' },
   { title: 'CPF', key: 'cpf' },
@@ -120,6 +146,16 @@ async function handleSave(personData: Person) {
   } else {
     // Passa os erros do DRF (ex: { cpf: ["CPF inválido"] }) para o formulário
     personFormRef.value?.setErrors(result.errors)
+  }
+}
+
+async function handleCalculateIdealWeight(id: number) {
+  const result = await store.getIdealWeight(id)
+  if (result.success) {
+    calculatedWeight.value = result.weight
+    idealWeightDialog.value = true
+  } else {
+    alert('Erro ao calcular peso ideal: ' + result.error)
   }
 }
 

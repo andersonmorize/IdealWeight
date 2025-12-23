@@ -69,5 +69,22 @@ export const usePersonStore = defineStore('person', () => {
     }
   }
 
-  return { persons, loading, fetchPersons, deletePerson, savePerson }
+  async function getIdealWeight(id: number) {
+    try {
+      const response = await api.get(`/persons/${id}/calculate_ideal_weight/`)
+
+      return { 
+        success: true, 
+        weight: response.data.ideal_weight 
+      }
+    } catch (error: any) {
+      console.error('Erro ao calcular:', error)
+      return { 
+        success: false, 
+        error: error.response?.data?.detail || 'Erro na requisição' 
+      }
+    }
+  }
+
+  return { persons, loading, fetchPersons, deletePerson, savePerson, getIdealWeight }
 })

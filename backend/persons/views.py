@@ -92,5 +92,5 @@ class PersonViewSet(viewsets.ViewSet):
         Ponto Extra: Cálculo do peso ideal via Server. 
         Retorna o valor para ser exibido em um popup no Client.
         """
-        resultado = PersonService.get_ideal_weight_calculation(id)
-        return Response({'peso_ideal': resultado}, status=status.HTTP_200_OK)
+        result = PersonService.get_ideal_weight_calculation(id)
+        return Response({'ideal_weight': result}, status=status.HTTP_200_OK)
