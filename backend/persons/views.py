@@ -85,3 +85,32 @@ class PersonViewSet(viewsets.ViewSet):
         """
         result = PersonService.get_ideal_weight_calculation(id)
         return Response({'ideal_weight': result}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def import_csv(self, request):
+        file = request.FILES.get('file')
+        if not file:
+            return Response({"error": "Arquivo não fornecido"}, status=400)
+        
+        try:
+            task_id = PersonService.handle_import_csv(file)
+            return Response({"task_id": task_id, "message": "Importação iniciada."}, status=202)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=400)
+
+    @action(detail=False, methods=['get'], url_path='import-status/(?P<task_id>[^/.]+)')
+    def import_status(self, request, task_id=None):
+        status_data = PersonService.get_task_status(task_id)
+        return Response(status_data)
+
+    @action(detail=False, methods=['post'])
+    def export_csv(self, request):
+        """Dispara o processo de exportação"""
+        task_id = PersonService.handle_export_csv()
+        return Response({"task_id": task_id, "message": "Exportação iniciada."}, status=202)
+
+    @action(detail=False, methods=['get'], url_path='export-status/(?P<task_id>[^/.]+)')
+    def export_status(self, request, task_id=None):
+        """Retorna o status e, se pronto, o link do arquivo"""
+        status_data = PersonService.get_export_status(task_id)
+        return Response(status_data)
