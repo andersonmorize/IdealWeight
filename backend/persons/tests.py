@@ -9,10 +9,11 @@ from .models import Person
 class PersonAPITests(APITestCase):
     def setUp(self):
         self.fake = Faker('pt_BR')
+        self.base_cpf = self.fake.cpf()
         self.person_data = {
             "name": "John Doe",
             "date_of_birth": "1990-05-15",
-            "cpf": "12345678901",
+            "cpf": self.base_cpf,
             "sex": "M",
             "height": 1.80,
             "weight": 85.00
@@ -37,24 +38,34 @@ class PersonAPITests(APITestCase):
         self.assertEqual(float(response.data['ideal_weight']), 54.66)
 
     def test_list_persons(self):
-        """Test if listing persons works"""
+        """Testa se a listagem de pessoas funciona"""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(len(response.data), 1)
 
     def test_search_by_cpf(self):
-        """Test the search functionality (Requirement: Pesquisar)"""
-        url = f"{self.url}?search=12345678901"
+        """Testa a funcionalidade de busca (Requisito: Pesquisar) """
+        url = f"{self.url}?cpf={self.base_cpf}" 
         response = self.client.get(url)
-        self.assertEqual(len(response.data['results']), 1)
-        self.assertEqual(response.data['results'][0]['cpf'], "12345678901")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['cpf'], self.base_cpf)
 
     def test_update_person(self):
-        """Test updating person's weight"""
+        """Testa a alteração do peso (Requisito: Alterar) """
         detail_url = reverse('person-detail', args=[self.person.id])
-        updated_data = {"weight": 82.00}
-        response = self.client.patch(detail_url, updated_data, format='json')
         
+        updated_data = {
+            "name": self.person.name,
+            "date_of_birth": self.person.date_of_birth,
+            "cpf": self.person.cpf,
+            "sex": self.person.sex,
+            "height": str(self.person.height),
+            "weight": 82.00
+        }
+        
+        response = self.client.put(detail_url, updated_data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.person.refresh_from_db()
         self.assertEqual(float(self.person.weight), 82.00)
