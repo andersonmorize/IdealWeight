@@ -113,7 +113,7 @@ const headers = [
   { title: 'Nasc.', key: 'date_of_birth' },
   { title: 'Sexo', key: 'sex' },
   { title: 'Peso (kg)', key: 'weight' },
-  { title: 'Ideal (kg)', key: 'ideal_weight' },
+  { title: 'Altura (m)', key: 'height' },
   { title: 'Ações', key: 'actions', sortable: false },
 ]
 
